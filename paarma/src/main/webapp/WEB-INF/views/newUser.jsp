@@ -8,7 +8,7 @@
 </head>
  
 <body>
-    <h2><spring:message code="lbl.page" text="Add New Employee" /></h2>
+    <h2><spring:message code="lbl.page" text="Luo käyttäjätili" /></h2>
     <br/>
     <form:form method="post" modelAttribute="user">
         <table>
@@ -21,8 +21,8 @@
                 <td><form:input path="lastName" /></td>
             </tr>
             <tr>
-                <td><spring:message code="lbl.email" text="Katuosoite" /></td>
-                <td><form:input path="email" /></td>
+                <td><spring:message code="lbl.streetAddress" text="Katuosoite" /></td>
+                <td><form:input path="streetAddress" /></td>
             </tr>
             <tr>
                 <td colspan="2"><input type="submit" value="Luo tili"/></td>
