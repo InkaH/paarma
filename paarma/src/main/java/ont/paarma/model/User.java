@@ -1,13 +1,26 @@
 package ont.paarma.model;
 
+import org.hibernate.validator.constraints.Length;
+import org.hibernate.validator.constraints.NotEmpty;
+
 public class User {
 	private int id;
+
+	@NotEmpty
+    @Length(min = 2, max = 50)
 	private String firstName;
+	@NotEmpty
+    @Length(min = 2, max = 50)
 	private String lastName;
+    @Length(min = 2, max = 50)
 	private String streetAddress;
+    @Length(min = 2, max = 10)
 	private String zipCode;
+    @Length(min = 2, max = 50)
 	private String city;
+    @Length(min = 2, max = 20)
 	private String phoneNumber;	
+    @Length(min = 2, max = 50)
 	private String email;
 	
 	public int getId() {
