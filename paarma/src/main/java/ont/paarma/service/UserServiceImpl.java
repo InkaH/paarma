@@ -6,7 +6,7 @@ public class UserServiceImpl implements UserService{
 
 	@Override
 	public User add(User addedUser) {
-		addedUser.setId(1);
+		addedUser.setId(3);
 		return addedUser;
 	}
 }
