@@ -23,6 +23,21 @@ public class User {
     @Length(min = 2, max = 50)
 	private String email;
 	
+    public User(){
+    	super();
+    }
+    
+	public User(int id, String firstName, String lastName) {
+		this.id = 1;
+		this.firstName = firstName;
+		this.lastName = lastName;
+	}
+	
+	public User(String firstName, String lastName) {
+		this.firstName = firstName;
+		this.lastName = lastName;
+	}
+
 	public int getId() {
 		return id;
 	}
