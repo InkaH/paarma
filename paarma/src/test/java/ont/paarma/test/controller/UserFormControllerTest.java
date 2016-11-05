@@ -29,11 +29,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
-import com.github.springtestdbunit.DbUnitTestExecutionListener;
-import com.github.springtestdbunit.annotation.DatabaseSetup;
-import com.github.springtestdbunit.annotation.ExpectedDatabase;
-import com.github.springtestdbunit.assertion.DatabaseAssertionMode;
-
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
@@ -45,10 +40,8 @@ import static org.hamcrest.Matchers.is;
 @ContextConfiguration(classes = {TestContext.class, AppConfig.class})
 @TestExecutionListeners({ DependencyInjectionTestExecutionListener.class,
     TransactionalTestExecutionListener.class,
-    DirtiesContextTestExecutionListener.class,
-    DbUnitTestExecutionListener.class })
+    DirtiesContextTestExecutionListener.class})
 @WebAppConfiguration
-@DatabaseSetup("UserData.xml")
 public class UserFormControllerTest{
 
 	private MockMvc mockMvc;
@@ -139,7 +132,6 @@ public class UserFormControllerTest{
 		assertThat(formObject.getLastName(), is("lastName"));
 	}	
 	@Test
-	@ExpectedDatabase(value="UserData-addUser.xml", assertionMode = DatabaseAssertionMode.NON_STRICT)
 	public void testCreateUserWithValidFieldsWithDBMock() throws Exception{
 		String firstName = "c";
 		String lastName = "c";
