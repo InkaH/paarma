@@ -1,15 +1,20 @@
-package ont.paarma.test.controller;
+package ont.paarma.test;
 
 import ont.paarma.config.AppConfig;
+import ont.paarma.config.SpringRootConfig;
+import ont.paarma.controller.UserController;
+import ont.paarma.dao.UserDAO;
 import ont.paarma.model.User;
 import ont.paarma.service.UserService;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.Mockito.*;
 import static org.mockito.Mockito.when;
@@ -17,10 +22,13 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Matchers.isA;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.support.AnnotationConfigContextLoader;
 import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
 import org.springframework.test.context.transaction.TransactionalTestExecutionListener;
 import org.springframework.test.context.support.DirtiesContextTestExecutionListener;
@@ -37,29 +45,32 @@ import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.is;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = {TestContext.class, AppConfig.class})
-@TestExecutionListeners({ DependencyInjectionTestExecutionListener.class,
-    TransactionalTestExecutionListener.class,
-    DirtiesContextTestExecutionListener.class})
+@ContextConfiguration(classes = {
+		AppConfig.class,
+        ServiceMockProvider.class
+})
 @WebAppConfiguration
-public class UserFormControllerTest{
+public class UserControllerTest{
 
 	private MockMvc mockMvc;
-
+	
 	@Autowired
 	private WebApplicationContext webApplicationContext;
 
 	@Autowired
-	private UserService userServiceMock;
-
+    private UserService userServiceMock;
+	
 	@Before
 	public void setUp() {
-
-		//reset mock between tests
-		Mockito.reset(userServiceMock);
-
+		
 		mockMvc = MockMvcBuilders
 				.webAppContextSetup(this.webApplicationContext).build();
+	}
+	
+	@After
+	public void tearDown(){
+		//reset mock between tests
+		Mockito.reset(userServiceMock);
 	}
 
 	@Test
@@ -99,53 +110,36 @@ public class UserFormControllerTest{
 		Mockito.verifyZeroInteractions(userServiceMock);
 	}
 
+	@SuppressWarnings("deprecation")
 	@Test
 	public void testCreateUserWithValidFields() throws Exception{
-		int id = 1;
-		String firstName = "firstName";
-		String lastName = "lastName";
-		User addedUser = new User(id, "firstName", "lastName");
-
-		when(userServiceMock.add(isA(User.class))).thenReturn(addedUser);
+		User addedUser = new User("etunimi", "sukunimi");
+		User returnedUser = new User(1, "etunimi", "sukunimi");
+		Mockito.when(userServiceMock.add(isA(User.class))).thenReturn(returnedUser);
 
 		mockMvc.perform(post("/newUser")
 				.contentType(MediaType.APPLICATION_FORM_URLENCODED)
-				.param("firstName", firstName)
-				.param("lastName", lastName)
+				.param("firstName", addedUser.getFirstName())
+				.param("lastName", addedUser.getLastName())
 				.sessionAttr("user", new User())
 				)
 		.andExpect(status().isMovedTemporarily())
 		.andExpect(view().name("redirect:/user/{id}"))
 		.andExpect(redirectedUrl("/user/1"))
 		.andExpect(flash().attribute("successMsg", is("Käyttäjätili luotu.")))
-		.andExpect(model().attribute("id", is("1")));	
+		.andExpect(model().attribute("id", is("1")));
 
-
-		ArgumentCaptor<User> formObjectArgument = ArgumentCaptor.forClass(User.class);
-		verify(userServiceMock, times(1)).add(formObjectArgument.capture());
-		Mockito.verifyNoMoreInteractions(userServiceMock);
-
-		User formObject = formObjectArgument.getValue();
-
-		assertThat(formObject.getId(), is(0));
-		assertThat(formObject.getFirstName(), is("firstName"));
-		assertThat(formObject.getLastName(), is("lastName"));
+        ArgumentCaptor<User> formObjectArgument = ArgumentCaptor.forClass(User.class);
+        Mockito.verify(userServiceMock, times(1)).add(formObjectArgument.capture());
+        Mockito.verifyNoMoreInteractions(userServiceMock);
+ 
+        User formObject = formObjectArgument.getValue();
+        assertThat(formObject.getId(), is(0));
+        assertThat(formObject.getFirstName(), is("etunimi"));
+        assertThat(formObject.getLastName(), is("sukunimi"));
 	}	
-	@Test
-	public void testCreateUserWithValidFieldsWithDBMock() throws Exception{
-		String firstName = "c";
-		String lastName = "c";
-		
-		mockMvc.perform(post("/newUser")
-				.contentType(MediaType.APPLICATION_FORM_URLENCODED)
-				.param("firstName", firstName)
-				.param("lastName", lastName)
-				.sessionAttr("user", new User())
-				)
-		.andExpect(status().isMovedTemporarily())
-		.andExpect(view().name("redirect:/user/{id}"))
-		.andExpect(redirectedUrl("/user/1"))
-		.andExpect(flash().attribute("successMsg", is("Käyttäjätili luotu.")))
-		.andExpect(model().attribute("id", is("3")));
-	}
+	
+
+	 
+	    
 }

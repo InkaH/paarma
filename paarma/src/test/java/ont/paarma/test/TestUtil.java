@@ -1,4 +1,6 @@
-package ont.paarma.test.controller;
+package ont.paarma.test;
+
+import ont.paarma.model.User;
 
 public class TestUtil {
 	
@@ -11,5 +13,12 @@ public class TestUtil {
  
         return builder.toString();
     }
+	
+	public static User createTestUserNoId(){
+		return new User("firstName", "lastName");
+	}
 
+	public static User createTestUserWithId(){
+		return new User(1, "firstName", "lastName");
+	}
 }

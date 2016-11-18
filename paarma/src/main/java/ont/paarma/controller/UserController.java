@@ -17,16 +17,12 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
-public class UserFormController{
+public class UserController{
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(UserFormController.class);
-
-	private UserService service;
+	private static final Logger LOGGER = LoggerFactory.getLogger(UserController.class);
 
 	@Autowired
-	public UserFormController(UserService service){
-		this.service = service;
-	}
+	private UserService service;
 
 	@RequestMapping(value = "/newUser", method = RequestMethod.GET)
 	public String setUpForm(Model model) { 
@@ -43,6 +39,9 @@ public class UserFormController{
 		}
 
 		User addedToDbUser = service.add(addedUser);
+
+			System.out.println(addedToDbUser.getId());
+
 		attributes.addAttribute("id", addedToDbUser.getId())
 		.addFlashAttribute("successMsg", "Käyttäjätili luotu.");
 		return createRedirectViewPath("/user/{id}");

@@ -21,10 +21,6 @@
                 <td><form:input path="lastName" /></td>
             </tr>
             <tr>
-                <td><spring:message code="lbl.streetAddress" text="Katuosoite" /></td>
-                <td><form:input path="streetAddress" /></td>
-            </tr>
-            <tr>
                 <td colspan="2"><input type="submit" value="Luo tili"/></td>
             </tr>
         </table>

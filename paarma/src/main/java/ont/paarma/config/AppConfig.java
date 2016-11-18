@@ -14,7 +14,7 @@ import org.springframework.web.servlet.view.JstlView;
 
 @Configuration
 @EnableWebMvc
-@ComponentScan(basePackages = "ont.paarma.controller")
+@ComponentScan("ont.paarma.controller")
 
 public class AppConfig {
 
@@ -28,20 +28,20 @@ public class AppConfig {
         return viewResolver;
     }
 	 
-	 @Bean
-	 public DataSource dataSource() {
-	 DriverManagerDataSource dataSource = new
-	 DriverManagerDataSource();
-	 dataSource.setDriverClassName("com.mysql.jdbc.Driver");
-	 dataSource.setUrl("jdbc:mysql://localhost:3306/db1");
-	 dataSource.setUsername("user1");
-	 dataSource.setPassword("pass1");
-	 return dataSource;
-	 }
-
-	 
-	 @Bean
-	 public JdbcTemplate jdbcTemplate(DataSource dataSource) {
-	 return new JdbcTemplate(dataSource);
-	 }
+//	 @Bean
+//	 public DataSource dataSource() {
+//	 DriverManagerDataSource dataSource = new
+//	 DriverManagerDataSource();
+//	 dataSource.setDriverClassName("com.mysql.jdbc.Driver");
+//	 dataSource.setUrl("jdbc:mysql://localhost:3306/db1");
+//	 dataSource.setUsername("user1");
+//	 dataSource.setPassword("pass1");
+//	 return dataSource;
+//	 }
+//
+//	 
+//	 @Bean
+//	 public JdbcTemplate jdbcTemplate(DataSource dataSource) {
+//	 return new JdbcTemplate(dataSource);
+//	 }
 }
