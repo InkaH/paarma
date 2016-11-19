@@ -1,64 +1,59 @@
-//package ont.paarma.test;
-//
-//import static org.hamcrest.Matchers.is;
-//import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-//import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.flash;
-//import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
-//import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
-//import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-//import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
-//
-//import org.junit.Assert;
-//import org.junit.Before;
-//import org.junit.Test;
-//import org.junit.runner.RunWith;
-//import org.mockito.Mockito;
-//import org.springframework.beans.factory.annotation.Autowired;
-//import org.springframework.http.MediaType;
-//import org.springframework.test.context.ContextConfiguration;
-//import org.springframework.test.context.TestExecutionListeners;
-//import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-//import org.springframework.test.context.support.DependencyInjectionTestExecutionListener;
-//import org.springframework.test.context.support.DirtiesContextTestExecutionListener;
-//import org.springframework.test.context.transaction.TransactionalTestExecutionListener;
-//import org.springframework.test.context.web.WebAppConfiguration;
-//
-//import ont.paarma.config.AppConfig;
-//import ont.paarma.dao.UserDAO;
-//import ont.paarma.model.User;
-//import ont.paarma.service.UserService;
-//
-//@RunWith(SpringJUnit4ClassRunner.class)
-//@ContextConfiguration(classes = {TestContext.class, AppConfig.class})
-//@TestExecutionListeners({ DependencyInjectionTestExecutionListener.class,
-//    TransactionalTestExecutionListener.class,
-//    DirtiesContextTestExecutionListener.class})
-//@WebAppConfiguration
-//public class UserDAOTest {
-//	
-//	@Autowired
-//	private UserDAO userDAOMock;
-//
-//	@Before
-//	public void setUp() {
-//		//reset mock between tests
-//		Mockito.reset(userDAOMock);
-//	}
-//
-//	  @Test
-//	  public void testUserDAOAddUserMethod() {
-//	    UserService userService = new UserService(userDAOMock);
-//	    userService.add(user);
-//	    Mockito.verify(userDAOMock).addUser(user);
-//	}
-//
-//	  @Test
-//	  public void testUserServiceAddUserMethod_userDaoAddUserReturnsUserObject() {
-//		UserService userService = new UserService(userDAOMock);
-////		User user = createTestUser();
-////	    Mockito.when(userDAOMock.addUser(user)).thenReturn();
-////	    User actual = myService.findById(1L);
-////	    Assert.assertEquals("My first name", actual.getFirstName());
-////	    Assert.assertEquals("My surname", actual.getLastName());
-//	}
-//}
+package ont.paarma.test;
+
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
+import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
+
+import ont.paarma.dao.UserDAO;
+import ont.paarma.model.User;
+
+public class UserDAOTest {
+	
+	private static EmbeddedDatabase db;
+    UserDAO userDao;
+    
+    @BeforeClass
+    public static void setUp() {
+    	db = new EmbeddedDatabaseBuilder()
+    		.setType(EmbeddedDatabaseType.HSQL).addScript("db/sql/create-db.sql")
+    		.addScript("db/sql/insert-data.sql").build();
+    }
+    
+    @AfterClass
+    public static void tearDown() {
+        db.shutdown();
+    }
+
+    @Test
+    public void testAddUser(){
+    	NamedParameterJdbcTemplate template = new NamedParameterJdbcTemplate(db);
+    	UserDAO userDao = new UserDAO();
+    	userDao.setNamedParameterJdbcTemplate(template);
+    	User user = TestUtil.createDBUser();
+    	User returned = userDao.addUser(user);
+    	Assert.assertNotNull(returned);
+    	Assert.assertEquals(4, returned.getId());
+    	Assert.assertEquals(user.getFirstName(), returned.getFirstName());
+    	Assert.assertEquals(user.getLastName(), returned.getLastName());
+    }
+    
+    @Test
+    public void testFindById() {
+    	NamedParameterJdbcTemplate template = new NamedParameterJdbcTemplate(db);
+    	UserDAO userDao = new UserDAO();
+    	userDao.setNamedParameterJdbcTemplate(template);
+    	
+    	User user = userDao.findById(4);
+    	Assert.assertNotNull(user);
+    	Assert.assertEquals(4, user.getId());
+    	Assert.assertEquals("testFirst", user.getFirstName());
+    	Assert.assertEquals("testLast", user.getLastName());
+    }
+}

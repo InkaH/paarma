@@ -1,5 +1,7 @@
 package ont.paarma.test;
 
+import java.util.Random;
+
 import ont.paarma.model.User;
 
 public class TestUtil {
@@ -20,5 +22,9 @@ public class TestUtil {
 
 	public static User createTestUserWithId(){
 		return new User(1, "firstName", "lastName");
+	}
+	
+	public static User createDBUser(){
+		return new User("testFirst", "testLast");
 	}
 }
