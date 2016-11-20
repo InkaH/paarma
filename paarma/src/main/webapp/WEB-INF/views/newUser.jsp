@@ -8,16 +8,16 @@
 </head>
  
 <body>
-    <h2><spring:message code="lbl.page" text="Luo käyttäjätili" /></h2>
+    <h2>Luo käyttäjätili</h2>
     <br/>
     <form:form method="post" modelAttribute="user">
         <table>
             <tr>
-                <td><spring:message code="lbl.firstName" text="Etunimi" /></td>
+                <td>Etunimi</td>
                 <td><form:input path="firstName" /></td>
             </tr>
             <tr>
-                <td><spring:message code="lbl.lastName" text="Sukunimi" /></td>
+                <td>Sukunimi</td>
                 <td><form:input path="lastName" /></td>
             </tr>
             <tr>
