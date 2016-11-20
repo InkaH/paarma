@@ -48,7 +48,6 @@ public class UserDAO {
 		String sql = "SELECT * FROM users WHERE id=:id";
 		User result = namedParameterJdbcTemplate.queryForObject(
 				sql,params, new UserMapper());	
-		System.out.println(result);
 		return result;
 	}
 	

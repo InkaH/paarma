@@ -22,8 +22,8 @@ public class UserDAOTest {
     @Before
     public void setUp() {
     	db = new EmbeddedDatabaseBuilder()
-    		.setType(EmbeddedDatabaseType.HSQL).addScript("db/sql/create-db.sql")
-    		.addScript("db/sql/insert-data.sql").build();
+    		.setType(EmbeddedDatabaseType.HSQL).addScript("db/sql/create-users.sql")
+    		.addScript("db/sql/insert-users.sql").build();
     }
     
     @After

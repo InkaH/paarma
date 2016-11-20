@@ -2,14 +2,17 @@ package ont.paarma.model;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.Date;
 
 public class Reservation {
 	private int id;
-	private LocalDate startDate;
-	private LocalDate endDate;
+	private int userId;
+	private String startDate;
+	private String endDate;
 	private int numPeriods;
 	private int table;
-	private BigDecimal tablePrice;
+	private BigDecimal tablePrice = new BigDecimal(50);
+	private BigDecimal totalPrice;
 	
 	public int getId() {
 		return id;
@@ -17,19 +20,24 @@ public class Reservation {
 	public void setId(int id) {
 		this.id = id;
 	}
-	public LocalDate getStartDate() {
+	public int getUserId() {
+		return userId;
+	}
+	public void setUserId(int id) {
+		this.userId = id;
+	}
+	public String getStartDate() {
 		return startDate;
 	}
-	public void setStartDate(LocalDate startDate) {
+	public void setStartDate(String startDate) {
 		this.startDate = startDate;
 	}
-	public LocalDate getEndDate() {
+	public String getEndDate() {
 		return endDate;
 	}
-	public void setEndDate(LocalDate endDate) {
+	public void setEndDate(String endDate) {
 		this.endDate = endDate;
 	}
-		
 	public int getNumPeriods() {
 		return numPeriods;
 	}
@@ -48,10 +56,18 @@ public class Reservation {
 	public void setTablePrice(BigDecimal tablePrice) {
 		this.tablePrice = tablePrice;
 	}
+	public BigDecimal getTotalPrice() {
+		return totalPrice;
+	}
+	public void setTotalPrice() {
+		
+		this.totalPrice = tablePrice.multiply(new BigDecimal(numPeriods));
+	}
 	
 	@Override
 	public String toString() {
-		return "Reservation [id=" + id + ", startDate=" + startDate + ", endDate=" + endDate + ", numPeriods="
-				+ numPeriods + ", table=" + table + ", tablePrice=" + tablePrice + "]";
+		return "Reservation [id=" + id + ", userId=" + userId + ", startDate=" + startDate + ", endDate=" + endDate
+				+ ", numPeriods=" + numPeriods + ", table=" + table + ", tablePrice=" + tablePrice + ", totalPrice="
+				+ totalPrice + "]";
 	}
 }

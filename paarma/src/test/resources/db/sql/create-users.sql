@@ -3,3 +3,4 @@ CREATE TABLE users (
   firstname VARCHAR(30),
   lastname  VARCHAR(50)
 );
+
