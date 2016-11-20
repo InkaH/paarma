@@ -67,7 +67,7 @@ public class UserController{
 			model.addAttribute("msg", "Virhe.");
 			return "editUser";
 		}
-//		service.add(user);
+		service.add(user);
 		model.addAttribute("msg", "Tili päivitetty.");
 		return "dashboard";
 	}	

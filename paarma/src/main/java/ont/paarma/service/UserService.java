@@ -12,7 +12,10 @@ public class UserService{
 	private UserDAO userDAO;
 
 	public User add(User user) {
-		return userDAO.addUser(user);
+		if(user.getId() == 0){
+			return userDAO.addUser(user);
+		}
+		else return userDAO.updateUser(user);
 	}
 	
 	public User findById(int id){

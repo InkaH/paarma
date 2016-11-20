@@ -33,18 +33,33 @@ public class UserServiceTest {
 	}
 
 	@Test
-	public void testUserServiceAddMethod_callsUserDaoAddUserOnce() {		
+	public void testAddMethod_callsUserDaoAddUserOnce() {		
 		User user = TestUtil.createTestUserNoId();
 		userService.add(user);
 		Mockito.verify(userDAOMock).addUser(user);
 	}
 
 	@Test
-	public void testUserServiceAddMethod_userDaoAddUserReturnsUserObject() {
+	public void testAddMethod_userDaoAddUserReturnsUserObject() {
 		User userNoId = TestUtil.createTestUserNoId();
 		User userWithId = TestUtil.createTestUserWithId();
 		Mockito.when(userDAOMock.addUser(userNoId)).thenReturn(userWithId);
 		User actual = userService.add(userNoId);
+		Assert.assertEquals(userWithId, actual);    
+	}
+	
+	@Test
+	public void testAddMethodWithId_callsUserDaoUpdateUserOnce() {		
+		User user = TestUtil.createTestUserWithId();
+		userService.add(user);
+		Mockito.verify(userDAOMock).updateUser(user);
+	}
+
+	@Test
+	public void testAddMethodWithId_userDaoUpdateUserReturnsUserObject() {
+		User userWithId = TestUtil.createTestUserWithId();
+		Mockito.when(userDAOMock.updateUser(userWithId)).thenReturn(userWithId);
+		User actual = userService.add(userWithId);
 		Assert.assertEquals(userWithId, actual);    
 	}
 }
