@@ -1,4 +1,4 @@
-package ont.paarma.test;
+package ont.paarma.test.UserTests;
 
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.is;
@@ -128,6 +128,71 @@ public class UserControllerTest{
         assertThat(formObject.getFirstName(), is("etunimi"));
         assertThat(formObject.getLastName(), is("sukunimi"));
 	}	
+	
+	@Test
+	public void testInitEditForm() throws Exception{
+		User editUser = TestUtil.createTestUserWithId();
+		mockMvc.perform(get("/user/editUser"))
+		.andExpect(status().isOk())
+		.andExpect(view().name("editUser"))
+		.andExpect(forwardedUrl("/WEB-INF/views/editUser.jsp"))
+		.andExpect(model().attribute(
+				"user", hasProperty("id", is(editUser.getId())))) 
+		.andExpect(model().attribute(
+				"user", hasProperty("firstName", is(editUser.getFirstName())))) 
+		.andExpect(model().attribute(
+				"user", hasProperty("lastName", is(editUser.getLastName())))); 
+	}
+	
+	@Test
+	public void testEditUserWithInvalidFields() throws Exception{
+		String firstName = TestUtil.createString(51);
+		String lastName = TestUtil.createString(1);
+
+		mockMvc.perform(post("user/editUser")
+				.contentType(MediaType.APPLICATION_FORM_URLENCODED)
+				.param("firstName", firstName)
+				.param("lastName", lastName)
+				.sessionAttr("user", new User())
+				)
+		.andExpect(status().isOk())
+		.andExpect(view().name("editUser"))
+		.andExpect(forwardedUrl("/WEB-INF/views/user/editUser.jsp"))
+		.andExpect(model().attributeHasFieldErrors("user", "firstName"))
+		.andExpect(model().attributeHasFieldErrors("user", "lastName"))
+		.andExpect(model().attribute("user", hasProperty("id", is(1))))
+		.andExpect(model().attribute("user", hasProperty("firstName", is(firstName))))
+		.andExpect(model().attribute("user", hasProperty("lastName", is(lastName))));
+		Mockito.verifyZeroInteractions(userServiceMock);
+	}
+	
+	@Test
+	public void testEditUserWithValidFields() throws Exception{
+		User editUser = TestUtil.createTestUserWithId();
+		Mockito.when(userServiceMock.add(isA(User.class))).thenReturn(editUser);
+
+		mockMvc.perform(post("user/editUser")
+				.contentType(MediaType.APPLICATION_FORM_URLENCODED)
+				.param("firstName", editUser.getFirstName())
+				.param("lastName", editUser.getLastName())
+				.sessionAttr("user", new User())
+				)
+		.andExpect(status().isMovedTemporarily())
+		.andExpect(view().name("redirect:/user/{id}"))
+		.andExpect(redirectedUrl("/user/1"))
+		.andExpect(flash().attribute("successMsg", is("Tiedot päivitetty.")))
+		.andExpect(model().attribute("id", is("1")));
+
+        ArgumentCaptor<User> formObjectArgument = ArgumentCaptor.forClass(User.class);
+        Mockito.verify(userServiceMock, times(1)).add(formObjectArgument.capture());
+        Mockito.verifyNoMoreInteractions(userServiceMock);
+ 
+        User formObject = formObjectArgument.getValue();
+        assertThat(formObject.getId(), is(1));
+        assertThat(formObject.getFirstName(), is("firstName"));
+        assertThat(formObject.getLastName(), is("lastName"));
+	}	
+	
 	
 
 	 

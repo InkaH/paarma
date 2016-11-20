@@ -1,4 +1,4 @@
-package ont.paarma.test;
+package ont.paarma.test.UserTests;
 
 import org.junit.After;
 import org.junit.AfterClass;

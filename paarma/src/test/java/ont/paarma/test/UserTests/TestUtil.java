@@ -1,4 +1,4 @@
-package ont.paarma.test;
+package ont.paarma.test.UserTests;
 
 import java.util.Random;
 

@@ -1,4 +1,4 @@
-package ont.paarma.test;
+package ont.paarma.test.UserTests;
 
 import org.mockito.Mockito;
 import org.springframework.context.annotation.Bean;
