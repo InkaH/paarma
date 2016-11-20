@@ -15,15 +15,15 @@
     
     <form:form method="post" modelAttribute="user">
     <label for="firstNameInput">Etunimi: </label>
-    <form:input path="firstName" id="nameInput"></form:input>
+    <form:input path="firstName"></form:input>
     <form:errors path="firstName" cssclass="error"></form:errors>
     <br />
-     
+     <br />
     <label for="lastNameInput">Sukunimi: </label>
-    <form:input path="lastName" id="ageInput"></form:input>
+    <form:input path="lastName"></form:input>
     <form:errors path="lastName" cssclass="error"></form:errors>
     <br />
-    
+    <br />
     <input type="submit" value="Luo tili" />
     </form:form>
 </body>

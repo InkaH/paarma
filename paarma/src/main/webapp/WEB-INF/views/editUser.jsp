@@ -14,20 +14,20 @@
     
     <form:form method="post" modelAttribute="user">
     	<label for="idInput">Asiakasnumero: </label>
-	    <form:input path="id" id="idInput" readonly="true"></form:input>
+	    <form:input path="id" readonly="true"></form:input>
 	    <br />
-	    
+	    <br />
 	    <label for="firstNameInput">Etunimi: </label>
-	    <form:input path="firstName" id="nameInput"></form:input>
+	    <form:input path="firstName"></form:input>
 	    <form:errors path="firstName" cssclass="error"></form:errors>
 	    <br />
-     
+     	<br />
 	    <label for="lastNameInput">Sukunimi: </label>
-	    <form:input path="lastName" id="ageInput"></form:input>
+	    <form:input path="lastName"></form:input>
 	    <form:errors path="lastName" cssclass="error"></form:errors>
 	    <br />
-    
-    	<input type="submit" value="Luo tili" />
+    	<br />
+    	<input type="submit" value="Tallenna muutokset" />
     </form:form>
 </body>
 </html>
