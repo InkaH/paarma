@@ -18,8 +18,8 @@ public class HsqlDataSource {
 		//shutdown unnecessary, EmbeddedDatabaseFactoryBean does it
 		EmbeddedDatabaseBuilder builder = new EmbeddedDatabaseBuilder();
 		EmbeddedDatabase db = builder.setType(EmbeddedDatabaseType.HSQL)
-				.addScript("db/sql/create-users.sql")
-				.addScript("db/sql/insert-users.sql")
+				.addScript("db/sql/create.sql")
+				.addScript("db/sql/insert.sql")
 				.build();
 		return db;
 	}
