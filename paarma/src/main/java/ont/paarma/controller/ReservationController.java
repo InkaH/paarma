@@ -1,9 +1,13 @@
 package ont.paarma.controller;
 
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 
 import org.slf4j.Logger;
@@ -19,6 +23,9 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.SessionAttributes;
+import org.springframework.web.bind.support.SessionAttributeStore;
+import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.servlet.ModelAndView;
 
 import ont.paarma.model.Reservation;
 import ont.paarma.model.User;
@@ -51,7 +58,11 @@ public class ReservationController{
 	    }
 	 
 	@RequestMapping(value = "/newReservation", method = RequestMethod.GET)
-	public String setUpForm(@ModelAttribute("reservation") Reservation reservation) { 
+	public String setUpForm(@ModelAttribute("reservation") Reservation reservation, WebRequest request) { 
+		//clear sessionAttribute between new reservations
+//		HttpSession session = request.getSession();
+//        session.setAttribute("user", new User());
+		request.removeAttribute("user", WebRequest.SCOPE_SESSION);
 		return "newReservation";
 	}
 
@@ -77,14 +88,24 @@ public class ReservationController{
 	}
 
 	@RequestMapping(value = "/editReservation", method = RequestMethod.POST)
-	public String edit(@Valid @ModelAttribute("reservation") Reservation reservation, 
+	public String editReservation(@Valid @ModelAttribute("reservation") Reservation reservation, 
 			BindingResult bindingResult, Model model){
 		if(bindingResult.hasErrors()) {
 			model.addAttribute("msg", "Virhe.");
 			return "editReservation";
 		}
-		reservationService.add(reservation);
+		reservationService.edit(reservation);
 		model.addAttribute("msg", "Varaus päivitetty.");
 		return "reservationView";
+	}	
+	
+	@RequestMapping(value = "/allReservations", method = RequestMethod.GET)
+	public ModelAndView findAllReservations(@ModelAttribute("reservation") Reservation reservation,
+			@ModelAttribute("user") User user){
+		List<Reservation> allReservations = reservationService.findAll(user.getId());
+		System.out.println(Arrays.toString(allReservations.toArray()));
+		ModelAndView model = new ModelAndView("/allReservations");
+		model.addObject("reservations", allReservations);
+		return model;
 	}	
 }

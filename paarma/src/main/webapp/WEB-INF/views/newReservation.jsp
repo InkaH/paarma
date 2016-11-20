@@ -29,8 +29,8 @@
     <form:errors path="numPeriods" cssclass="error"></form:errors>
     <br />
     <br />
-    Varausjakso päättyy: [placeholder]
-    <input type="submit" value="Siirry vahvistamaan varaus" />
+    <p>Varausjakso päättyy: [placeholder]<p>
+    <input type="submit" value="Tee varaus" />
     </form:form>
 </body>
 </html>

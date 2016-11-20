@@ -16,14 +16,15 @@ public class ReservationService {
 	private ReservationDAO reservationDAO;
 
 	public Reservation add(Reservation reservation) {
-		if(reservation.getId() == 0){
-			return reservationDAO.addReservation(reservation);
-		}
-		else return reservationDAO.updateReservation(reservation);
+		return reservationDAO.addReservation(reservation);
 	}
 
 	public Reservation findById(int id){
 		return reservationDAO.findById(id);
+	}
+	
+	public Reservation edit(Reservation reservation) {
+		return reservationDAO.updateReservation(reservation);
 	}
 	
 	public List<Reservation> findAll(int id){

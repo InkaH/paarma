@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -34,8 +35,6 @@ public class ReservationDAO {
 		KeyHolder idHolder = new GeneratedKeyHolder();
 		String sql = "INSERT INTO reservations (userId, startDate, numPeriods, tablenum, tablePrice) "
 				+ "VALUES (:userId, :startDate, :numPeriods, :table, :tablePrice)";
-		System.out.println(reservation);
-		System.out.println(sql);
 		namedParameterJdbcTemplate.update(
 				sql, parameters, idHolder);
 
@@ -58,13 +57,12 @@ public class ReservationDAO {
 
 	@SuppressWarnings("unchecked")
 	public List<Reservation> findAll(int id) {
-		Map<String, Object> params = new HashMap<String, Object>();
-		params.put("id", id);
-
+		SqlParameterSource params = new MapSqlParameterSource("id", Integer.valueOf(id));
+		System.out.println("hakuid "+id);
 		String sql = "SELECT * FROM reservations WHERE userId=:id";
-		@SuppressWarnings("rawtypes")
+		ReservationMapper mapper = new ReservationMapper();
 		List<Reservation> reservations  = namedParameterJdbcTemplate.query(sql,
-				new BeanPropertyRowMapper(Reservation.class));	
+				params, mapper);	
 		return reservations;
 	}
 
