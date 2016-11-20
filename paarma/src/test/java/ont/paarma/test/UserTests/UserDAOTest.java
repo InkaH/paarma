@@ -19,15 +19,15 @@ public class UserDAOTest {
 	private static EmbeddedDatabase db;
     UserDAO userDao;
     
-    @BeforeClass
-    public static void setUp() {
+    @Before
+    public void setUp() {
     	db = new EmbeddedDatabaseBuilder()
     		.setType(EmbeddedDatabaseType.HSQL).addScript("db/sql/create-db.sql")
     		.addScript("db/sql/insert-data.sql").build();
     }
     
-    @AfterClass
-    public static void tearDown() {
+    @After
+    public void tearDown() {
         db.shutdown();
     }
 
@@ -49,11 +49,27 @@ public class UserDAOTest {
     	NamedParameterJdbcTemplate template = new NamedParameterJdbcTemplate(db);
     	UserDAO userDao = new UserDAO();
     	userDao.setNamedParameterJdbcTemplate(template);
+    	//first add user to db
+    	User user = TestUtil.createDBUser();
+    	User returnedAdd = userDao.addUser(user);
+    	User returnedFind = userDao.findById(returnedAdd.getId());
+    	Assert.assertNotNull(returnedFind);
+    	Assert.assertEquals(returnedAdd.getId(), returnedFind.getId());
+    	Assert.assertEquals(returnedAdd.getFirstName(), returnedFind.getFirstName());
+    	Assert.assertEquals(returnedAdd.getLastName(), returnedFind.getLastName());
+    }
+    
+    @Test
+    public void testUpdateUser(){
+    	NamedParameterJdbcTemplate template = new NamedParameterJdbcTemplate(db);
+    	UserDAO userDao = new UserDAO();
+    	userDao.setNamedParameterJdbcTemplate(template);
     	
-    	User user = userDao.findById(4);
-    	Assert.assertNotNull(user);
-    	Assert.assertEquals(4, user.getId());
-    	Assert.assertEquals("testFirst", user.getFirstName());
-    	Assert.assertEquals("testLast", user.getLastName());
+    	User user = TestUtil.createDBUpdateUser();
+    	User returned = userDao.updateUser(user);
+    	Assert.assertNotNull(returned);
+    	Assert.assertEquals(user.getId(), returned.getId());
+    	Assert.assertEquals(user.getFirstName(), returned.getFirstName());
+    	Assert.assertEquals(user.getLastName(), returned.getLastName());
     }
 }

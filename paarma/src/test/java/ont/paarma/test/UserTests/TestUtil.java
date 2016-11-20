@@ -27,4 +27,8 @@ public class TestUtil {
 	public static User createDBUser(){
 		return new User("testFirst", "testLast");
 	}
+	
+	public static User createDBUpdateUser(){
+		return new User(4, "testFirst2", "testLast2");
+	}
 }

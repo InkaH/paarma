@@ -52,6 +52,16 @@ public class UserDAO {
 		return result;
 	}
 	
+	public User updateUser(User user) {
+		SqlParameterSource parameters = new BeanPropertySqlParameterSource(user);
+		String sql = "UPDATE users SET firstName=:firstName, lastName=:lastName"
+				+ " WHERE id=:id";
+
+		namedParameterJdbcTemplate.update(
+				sql, parameters);
+		return user;
+	}
+	
 	private static final class UserMapper implements RowMapper<User> {
 
 		public User mapRow(ResultSet rs, int rowNum) throws SQLException {
