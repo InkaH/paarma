@@ -2,6 +2,7 @@ package ont.paarma.test.UserTests;
 
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.isA;
@@ -14,6 +15,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.request;
 
 import org.junit.After;
 import org.junit.Before;
@@ -28,6 +30,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.context.WebApplicationContext;
 
 import ont.paarma.config.AppConfig;
@@ -70,99 +73,91 @@ public class UserControllerTest{
 		.andExpect(status().isOk())
 		.andExpect(view().name("newUser"))
 		.andExpect(forwardedUrl("/WEB-INF/views/newUser.jsp"))
-		.andExpect(model().attribute(
-				"user", hasProperty("id", is(0)))) 
-		.andExpect(model().attribute(
-				"user", hasProperty("firstName", nullValue()))) 
-		.andExpect(model().attribute(
-				"user", hasProperty("lastName", nullValue()))); 
+		.andExpect(request().sessionAttribute("user", hasProperty("id", is(0))))
+		.andExpect(request().sessionAttribute("user", hasProperty("firstName", nullValue())))
+		.andExpect(request().sessionAttribute("user", hasProperty("lastName", nullValue())));  
 	}
-
+	
 	@Test
 	public void testCreateUserWithInvalidFields() throws Exception{
 		String firstName = TestUtil.createString(51);
 		String lastName = TestUtil.createString(1);
+		User invalidUser = new User(0, firstName, lastName);
 
 		mockMvc.perform(post("/newUser")
 				.contentType(MediaType.APPLICATION_FORM_URLENCODED)
-				.param("firstName", firstName)
-				.param("lastName", lastName)
-				.sessionAttr("user", new User())
+				.sessionAttr("user", invalidUser)
 				)
 		.andExpect(status().isOk())
 		.andExpect(view().name("newUser"))
 		.andExpect(forwardedUrl("/WEB-INF/views/newUser.jsp"))
 		.andExpect(model().attributeHasFieldErrors("user", "firstName"))
 		.andExpect(model().attributeHasFieldErrors("user", "lastName"))
-		.andExpect(model().attribute("user", hasProperty("id", is(0))))
-		.andExpect(model().attribute("user", hasProperty("firstName", is(firstName))))
-		.andExpect(model().attribute("user", hasProperty("lastName", is(lastName))));
+		.andExpect(request().sessionAttribute("user", hasProperty("id", is(invalidUser.getId())))) 
+		.andExpect(request().sessionAttribute("user", hasProperty("firstName", is(invalidUser.getFirstName())))) 
+		.andExpect(request().sessionAttribute("user", hasProperty("lastName", is(invalidUser.getLastName()))));
 		Mockito.verifyZeroInteractions(userServiceMock);
 	}
 
-	@SuppressWarnings("deprecation")
 	@Test
 	public void testCreateUserWithValidFields() throws Exception{
-		User addedUser = new User("etunimi", "sukunimi");
-		User returnedUser = new User(1, "etunimi", "sukunimi");
+		User addedUser = TestUtil.createTestUserNoId();
+		User returnedUser = TestUtil.createTestUserWithId();
 		Mockito.when(userServiceMock.add(isA(User.class))).thenReturn(returnedUser);
 
 		mockMvc.perform(post("/newUser")
 				.contentType(MediaType.APPLICATION_FORM_URLENCODED)
-				.param("firstName", addedUser.getFirstName())
-				.param("lastName", addedUser.getLastName())
-				.sessionAttr("user", new User())
+				.sessionAttr("user", addedUser)
 				)
-		.andExpect(status().isMovedTemporarily())
-		.andExpect(view().name("redirect:/user/{id}"))
-		.andExpect(redirectedUrl("/user/1"))
-		.andExpect(flash().attribute("successMsg", is("Käyttäjätili luotu.")))
-		.andExpect(model().attribute("id", is("1")));
+		.andExpect(view().name("dashboard"))
+		.andExpect(forwardedUrl("/WEB-INF/views/dashboard.jsp"))
+		.andExpect(model().attribute("msg", is("Käyttäjätili luotu.")))
+		.andExpect(request().sessionAttribute("user", hasProperty("id", is(addedUser.getId())))) 
+		.andExpect(request().sessionAttribute("user", hasProperty("firstName", is(addedUser.getFirstName())))) 
+		.andExpect(request().sessionAttribute("user", hasProperty("lastName", is(addedUser.getLastName()))));
 
         ArgumentCaptor<User> formObjectArgument = ArgumentCaptor.forClass(User.class);
         Mockito.verify(userServiceMock, times(1)).add(formObjectArgument.capture());
         Mockito.verifyNoMoreInteractions(userServiceMock);
  
         User formObject = formObjectArgument.getValue();
-        assertThat(formObject.getId(), is(0));
-        assertThat(formObject.getFirstName(), is("etunimi"));
-        assertThat(formObject.getLastName(), is("sukunimi"));
+        assertThat(formObject.getId(), is(returnedUser.getId()));
+        assertThat(formObject.getFirstName(), is(returnedUser.getFirstName()));
+        assertThat(formObject.getLastName(), is(returnedUser.getLastName()));
 	}	
 	
 	@Test
 	public void testInitEditForm() throws Exception{
 		User editUser = TestUtil.createTestUserWithId();
-		mockMvc.perform(get("/user/editUser"))
+		
+		mockMvc.perform(get("/editUser")
+		.sessionAttr("user", editUser))
 		.andExpect(status().isOk())
 		.andExpect(view().name("editUser"))
 		.andExpect(forwardedUrl("/WEB-INF/views/editUser.jsp"))
-		.andExpect(model().attribute(
-				"user", hasProperty("id", is(editUser.getId())))) 
-		.andExpect(model().attribute(
-				"user", hasProperty("firstName", is(editUser.getFirstName())))) 
-		.andExpect(model().attribute(
-				"user", hasProperty("lastName", is(editUser.getLastName())))); 
+		.andExpect(request().sessionAttribute("user", hasProperty("id", is(editUser.getId()))))
+		.andExpect(request().sessionAttribute("user", hasProperty("firstName", is(editUser.getFirstName())))) 
+		.andExpect(request().sessionAttribute("user", hasProperty("lastName", is(editUser.getLastName())))); 
 	}
 	
 	@Test
 	public void testEditUserWithInvalidFields() throws Exception{
 		String firstName = TestUtil.createString(51);
 		String lastName = TestUtil.createString(1);
+		User invalidUser = new User(1, firstName, lastName);
 
-		mockMvc.perform(post("user/editUser")
+		mockMvc.perform(post("/editUser")
 				.contentType(MediaType.APPLICATION_FORM_URLENCODED)
-				.param("firstName", firstName)
-				.param("lastName", lastName)
-				.sessionAttr("user", new User())
+				.sessionAttr("user", invalidUser)
 				)
 		.andExpect(status().isOk())
 		.andExpect(view().name("editUser"))
-		.andExpect(forwardedUrl("/WEB-INF/views/user/editUser.jsp"))
+		.andExpect(forwardedUrl("/WEB-INF/views/editUser.jsp"))
 		.andExpect(model().attributeHasFieldErrors("user", "firstName"))
 		.andExpect(model().attributeHasFieldErrors("user", "lastName"))
-		.andExpect(model().attribute("user", hasProperty("id", is(1))))
-		.andExpect(model().attribute("user", hasProperty("firstName", is(firstName))))
-		.andExpect(model().attribute("user", hasProperty("lastName", is(lastName))));
+		.andExpect(request().sessionAttribute("user", hasProperty("id", is(invalidUser.getId())))) 
+		.andExpect(request().sessionAttribute("user", hasProperty("firstName", is(invalidUser.getFirstName())))) 
+		.andExpect(request().sessionAttribute("user", hasProperty("lastName", is(invalidUser.getLastName()))));
 		Mockito.verifyZeroInteractions(userServiceMock);
 	}
 	
@@ -171,18 +166,16 @@ public class UserControllerTest{
 		User editUser = TestUtil.createTestUserWithId();
 		Mockito.when(userServiceMock.add(isA(User.class))).thenReturn(editUser);
 
-		mockMvc.perform(post("user/editUser")
+		mockMvc.perform(post("/editUser")
 				.contentType(MediaType.APPLICATION_FORM_URLENCODED)
-				.param("firstName", editUser.getFirstName())
-				.param("lastName", editUser.getLastName())
-				.sessionAttr("user", new User())
+				.sessionAttr("user", editUser)
 				)
-		.andExpect(status().isMovedTemporarily())
-		.andExpect(view().name("redirect:/user/{id}"))
-		.andExpect(redirectedUrl("/user/1"))
-		.andExpect(flash().attribute("successMsg", is("Tiedot päivitetty.")))
-		.andExpect(model().attribute("id", is("1")));
-
+		.andExpect(forwardedUrl("/WEB-INF/views/dashboard.jsp"))
+		.andExpect(model().attribute("msg", is("Tili päivitetty.")))
+		.andExpect(request().sessionAttribute("user", hasProperty("id", is(editUser.getId())))) 
+		.andExpect(request().sessionAttribute("user", hasProperty("firstName", is(editUser.getFirstName())))) 
+		.andExpect(request().sessionAttribute("user", hasProperty("lastName", is(editUser.getLastName()))));
+		
         ArgumentCaptor<User> formObjectArgument = ArgumentCaptor.forClass(User.class);
         Mockito.verify(userServiceMock, times(1)).add(formObjectArgument.capture());
         Mockito.verifyNoMoreInteractions(userServiceMock);

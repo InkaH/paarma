@@ -5,7 +5,7 @@
       <title>Paarma-varausjärjestelmä</title>
    </head>
    <body>      
-      <h3>${successMsg}</h3>
+      <h3>${msg}</h3>
       <h5>Käyttäjätiedot:</h5>    
       <p>Asiakastunnus: ${user.id}</p>
       <p>Etunimi: ${user.firstName}</p>
