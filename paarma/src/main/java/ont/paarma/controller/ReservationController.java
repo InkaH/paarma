@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionAttributeStore;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import ont.paarma.model.Reservation;
 import ont.paarma.model.User;
@@ -52,18 +53,17 @@ public class ReservationController{
 
 	 @InitBinder
 	    public void initBinder(WebDataBinder binder) {
-	        SimpleDateFormat sdf = new SimpleDateFormat("ddMMyyyy");
+	        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
 	        sdf.setLenient(true);
 	        binder.registerCustomEditor(Date.class, new CustomDateEditor(sdf, true));
 	    }
 	 
 	@RequestMapping(value = "/newReservation", method = RequestMethod.GET)
-	public String setUpForm(@ModelAttribute("reservation") Reservation reservation, WebRequest request) { 
+	public ModelAndView setUpForm(@ModelAttribute("reservation") Reservation reservation) { 
 		//clear sessionAttribute between new reservations
 //		HttpSession session = request.getSession();
 //        session.setAttribute("user", new User());
-		request.removeAttribute("user", WebRequest.SCOPE_SESSION);
-		return "newReservation";
+		return new ModelAndView("newReservation", "reservation", new Reservation());
 	}
 
 	@RequestMapping(value = "/newReservation", method = RequestMethod.POST)
@@ -75,9 +75,7 @@ public class ReservationController{
 		}
 
 		reservation.setUserId(user.getId());
-		System.out.println("reservation in add reservation " + reservation.toString());
-		Reservation addedToDbReservation = reservationService.add(reservation);
-		reservation.setId(addedToDbReservation.getId());
+		reservation = reservationService.add(reservation);
 		model.addAttribute("msg", "Varaus tehty.");
 		return "reservationView";
 	}	
@@ -94,7 +92,7 @@ public class ReservationController{
 			model.addAttribute("msg", "Virhe.");
 			return "editReservation";
 		}
-		reservationService.edit(reservation);
+		reservation = reservationService.edit(reservation);
 		model.addAttribute("msg", "Varaus päivitetty.");
 		return "reservationView";
 	}	
@@ -104,8 +102,20 @@ public class ReservationController{
 			@ModelAttribute("user") User user){
 		List<Reservation> allReservations = reservationService.findAll(user.getId());
 		System.out.println(Arrays.toString(allReservations.toArray()));
-		ModelAndView model = new ModelAndView("/allReservations");
-		model.addObject("reservations", allReservations);
-		return model;
+		return new ModelAndView("/allReservations", "reservations", allReservations);
+	}	
+	
+	@RequestMapping(value = "/deleteReservation", method = RequestMethod.GET)
+	public ModelAndView deleteReservation(@ModelAttribute("reservation") Reservation reservation,
+			@ModelAttribute("user") User user, RedirectAttributes redir){
+		reservationService.delete(user.getId());
+		redir.addFlashAttribute("msg", "Varaus poistettu.");
+		return new ModelAndView("redirect:/allReservations");
+	}	
+	
+	@RequestMapping(value = "/dashboard", method = RequestMethod.GET)
+	public String viewDashboard(@ModelAttribute("reservation") Reservation reservation,
+			@ModelAttribute("user") User user){
+		return "dashboard";
 	}	
 }

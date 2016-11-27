@@ -5,11 +5,11 @@
  
 <html>
 <head>
-    <title>Uusi paikkavaraus</title>
+    <title>Muokkaa paikkavarausta</title>
 </head>
  
 <body>
-    <h2>Tee varaus</h2>
+    <h2>Muokkaa varausta</h2>
     <br/>
     <h3>${msg}</h3>
     

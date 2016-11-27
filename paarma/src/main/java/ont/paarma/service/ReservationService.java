@@ -16,6 +16,10 @@ public class ReservationService {
 	private ReservationDAO reservationDAO;
 
 	public Reservation add(Reservation reservation) {
+		reservation.setEndDate(reservation.getStartDate(), reservation.getNumPeriods());
+		reservation.setTotalPrice(reservation.getTablePrice());
+		reservation.setStartDateSql(reservation.getStartDate());
+		reservation.setEndDateSql(reservation.getEndDate());
 		return reservationDAO.addReservation(reservation);
 	}
 
@@ -24,11 +28,15 @@ public class ReservationService {
 	}
 	
 	public Reservation edit(Reservation reservation) {
+		reservation.setEndDate(reservation.getStartDate(), reservation.getNumPeriods());
+		reservation.setTotalPrice(reservation.getTablePrice());
+		reservation.setStartDateSql(reservation.getStartDate());
+		reservation.setEndDateSql(reservation.getEndDate());
 		return reservationDAO.updateReservation(reservation);
 	}
 	
 	public List<Reservation> findAll(int id){
-		List<Reservation> reservationList= new ArrayList<Reservation>();
+		List<Reservation> reservationList = new ArrayList<Reservation>();
 		reservationList = reservationDAO.findAll(id);
 		return reservationList;
 	}
