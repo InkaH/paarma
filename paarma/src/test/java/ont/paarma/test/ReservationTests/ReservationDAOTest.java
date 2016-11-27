@@ -1,5 +1,8 @@
 package ont.paarma.test.ReservationTests;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -37,41 +40,77 @@ public class ReservationDAOTest {
     	NamedParameterJdbcTemplate template = new NamedParameterJdbcTemplate(db);
     	ReservationDAO reservationDao = new ReservationDAO();
     	reservationDao.setNamedParameterJdbcTemplate(template);
-    	Reservation reservation = TestUtil.createReservationNoId();
+    	Reservation reservation = ReservationTestUtil.createReservationNoId();
     	Reservation returned = reservationDao.addReservation(reservation);
     	Assert.assertNotNull(returned);
     	Assert.assertEquals(4, returned.getId());
     	Assert.assertEquals(reservation.getStartDate(), returned.getStartDate());
     	Assert.assertEquals(reservation.getTable(), returned.getTable());
     	Assert.assertEquals(reservation.getNumPeriods(), returned.getNumPeriods());
+    	Assert.assertEquals(reservation.getEndDate(), returned.getEndDate());
     }
     
     @Test
     public void testFindById() {
     	NamedParameterJdbcTemplate template = new NamedParameterJdbcTemplate(db);
-    	UserDAO userDao = new UserDAO();
-    	userDao.setNamedParameterJdbcTemplate(template);
-    	//first add user to db
-    	User user = TestUtil.createDBUser();
-    	User returnedAdd = userDao.addUser(user);
-    	User returnedFind = userDao.findById(returnedAdd.getId());
+    	ReservationDAO reservationDao = new ReservationDAO();
+    	reservationDao.setNamedParameterJdbcTemplate(template);
+    	//first add reservation to db
+    	Reservation reservation = ReservationTestUtil.createReservationNoId();
+    	Reservation returned = reservationDao.addReservation(reservation);
+    	Reservation returnedFind = reservationDao.findById(returned.getId());
     	Assert.assertNotNull(returnedFind);
-    	Assert.assertEquals(returnedAdd.getId(), returnedFind.getId());
-    	Assert.assertEquals(returnedAdd.getFirstName(), returnedFind.getFirstName());
-    	Assert.assertEquals(returnedAdd.getLastName(), returnedFind.getLastName());
+    	Assert.assertEquals(returned.getId(), returnedFind.getId());
     }
     
     @Test
-    public void testUpdateUser(){
+    public void testFindAll() {
     	NamedParameterJdbcTemplate template = new NamedParameterJdbcTemplate(db);
-    	UserDAO userDao = new UserDAO();
-    	userDao.setNamedParameterJdbcTemplate(template);
-    	
-    	User user = TestUtil.createDBUpdateUser();
-    	User returned = userDao.updateUser(user);
+    	ReservationDAO reservationDao = new ReservationDAO();
+    	reservationDao.setNamedParameterJdbcTemplate(template);
+    	List<Reservation> reservations = new ArrayList<Reservation>();
+    	//we know userId 1 has 2 reservations in our test db
+    	reservations = reservationDao.findAll(1);
+    	Assert.assertNotNull(reservations);
+    	Assert.assertTrue((reservations.size() == 2));
+    	Assert.assertEquals(reservations.get(0).getId(), 1);
+    	Assert.assertEquals(reservations.get(1).getId(), 2);
+    }
+    
+    @Test
+    public void testFindAllWithNoReservationsInDB_returnsEmptyList() {
+    	NamedParameterJdbcTemplate template = new NamedParameterJdbcTemplate(db);
+    	ReservationDAO reservationDao = new ReservationDAO();
+    	reservationDao.setNamedParameterJdbcTemplate(template);
+    	List<Reservation> reservations = new ArrayList<Reservation>();
+    	//we know userId 3 has no reservations in our test db
+    	reservations = reservationDao.findAll(3);
+    	Assert.assertNotNull(reservations);
+    	Assert.assertTrue((reservations.size() == 0));
+    }
+    
+    @Test
+    public void testUpdateReservation(){
+    	NamedParameterJdbcTemplate template = new NamedParameterJdbcTemplate(db);
+    	ReservationDAO reservationDao = new ReservationDAO();
+    	reservationDao.setNamedParameterJdbcTemplate(template);
+    	Reservation reservation = ReservationTestUtil.createReservationNoId();
+    	Reservation returned = reservationDao.updateReservation(reservation);
     	Assert.assertNotNull(returned);
-    	Assert.assertEquals(user.getId(), returned.getId());
-    	Assert.assertEquals(user.getFirstName(), returned.getFirstName());
-    	Assert.assertEquals(user.getLastName(), returned.getLastName());
+    	Assert.assertEquals(reservation.getId(), returned.getId());
+    	Assert.assertEquals(reservation.getStartDate(), returned.getStartDate());
+    	Assert.assertEquals(reservation.getTable(), returned.getTable());
+    	Assert.assertEquals(reservation.getNumPeriods(), returned.getNumPeriods());
+    	Assert.assertEquals(reservation.getEndDate(), returned.getEndDate());
+    }
+    
+    @Test
+    public void testDeleteReservation(){
+    	NamedParameterJdbcTemplate template = new NamedParameterJdbcTemplate(db);
+    	ReservationDAO reservationDao = new ReservationDAO();
+    	reservationDao.setNamedParameterJdbcTemplate(template);
+    	reservationDao.deleteReservation(3);
+    	Reservation returnedFind = reservationDao.findById(3);
+    	Assert.assertNull(returnedFind);
     }
 }

@@ -1,4 +1,4 @@
-package ont.paarma.test.UserTests;
+package ont.paarma.test.ReservationTests;
 
 import org.mockito.Mockito;
 import org.springframework.context.annotation.Bean;
@@ -10,7 +10,7 @@ import ont.paarma.service.ReservationService;
 import ont.paarma.service.UserService;
 
 @Configuration
-class ServiceMockProvider {
+class ReservationServiceMockProvider {
 	
 	@Bean
 	public UserService userService () {

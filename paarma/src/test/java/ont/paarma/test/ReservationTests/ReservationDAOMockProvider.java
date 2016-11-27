@@ -1,30 +1,18 @@
-package ont.paarma.test.UserTests;
+package ont.paarma.test.ReservationTests;
 
 import org.mockito.Mockito;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import ont.paarma.dao.ReservationDAO;
-import ont.paarma.dao.UserDAO;
 import ont.paarma.service.ReservationService;
-import ont.paarma.service.UserService;
 
 @Configuration
-class ServiceMockProvider {
+class ReservationDAOMockProvider {
 	
 	@Bean
-	public UserService userService () {
-		return  Mockito.mock(UserService.class);
-	}
-	
-	@Bean
-	public UserDAO userDAO(){
-		return Mockito.mock(UserDAO.class);
-	}
-	
-	@Bean 
 	public ReservationService reservationService(){
-		return Mockito.mock(ReservationService.class);
+		return new ReservationService();
 	}
 	
 	@Bean
@@ -32,4 +20,3 @@ class ServiceMockProvider {
 		return Mockito.mock(ReservationDAO.class);
 	}
 }
-
