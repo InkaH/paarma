@@ -7,9 +7,10 @@ CREATE TABLE users (
 CREATE TABLE reservations (
 	id INTEGER IDENTITY PRIMARY KEY,
 	userId INTEGER,
-	startDate VARCHAR(50),
+	startDate DATE,
+	endDate DATE,
 	numPeriods INTEGER,
-	tablenum INTEGER,
+	tablenum VARCHAR(20),
 	tableprice DOUBLE,
 	FOREIGN KEY (userId) REFERENCES users(id)
 );
